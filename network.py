@@ -18,14 +18,24 @@ class Network():
         self.n = n
         self.m_r = m_r
         self.m_s = m_s
+        self.ic_rate = .016
+        self.icf_rate = .08
+        self.close_friends_rate = .1
 
     def generate_network(self):
         g = nx.Graph()
+        rng = np.random.default_rng()
         g.add_nodes_from(range(self.n_0))
         for new_node in range(self.n_0, self.n):
-            c1 = np.random.binomial(1, .95) + 1
-            rng = np.random.default_rng()
-            initial_contacts = rng.choice(np.array(g.nodes()), c1, replace=False)
+            g.add_node(new_node,
+                senior=rng.binomial(1, .5),
+                ic=rng.binomial(1, self.ic_rate),
+                icf=rng.binomial(1, self.icf_rate))
+            c1 = rng.binomial(1, .05) + 1
+            initial_contacts = rng.choice(
+                np.array(g.nodes()),
+                c1,
+                replace=False)
             secondary_pool = []
             for i in initial_contacts:
                 secondary_pool += list(g.neighbors(i))
@@ -37,5 +47,7 @@ class Network():
                     c2,
                     replace=False)
                 for i in secondary_contacts:
-                    g.add_edge(new_node, i)
+                    g.add_edge(new_node,
+                        i,
+                        close=rng.binomial(1, self.close_friends_rate))
         return g
