@@ -39,7 +39,9 @@ class Network():
             secondary_pool = []
             for i in initial_contacts:
                 secondary_pool += list(g.neighbors(i))
-                g.add_edge(new_node, i)
+                g.add_edge(new_node,
+                    i,
+                    close=rng.binomial(1, self.close_friends_rate))
             c2 = min(rng.integers(1, 4), len(secondary_pool))
             if secondary_pool:
                 secondary_contacts = rng.choice(
