@@ -58,13 +58,20 @@ class Evaluator():
         [[both distance, I distance],
         [you distance, neither distance]]
         """
-        both_dist = self.decision_utility(i, j, 0, 0)
-        i_dist = self.decision_utility(i, j, 0, 1)
-        j_dist = self.decision_utility(i, j, 1, 0)
-        none_dist = self.decision_utility(i, j, 1, 1)
+        both_dist_i = self.decision_utility(i, j, 0, 0)
+        both_dist_j = self.decision_utility(j, i, 0, 0)
+
+        i_dist_i = self.decision_utility(i, j, 0, 1)
+        i_dist_j = self.decision_utility(j, i, 1, 0)
+
+        j_dist_i = self.decision_utility(i, j, 1, 0)
+        j_dist_j = self.decision_utility(j, i, 0, 1)
+
+        none_dist_i = self.decision_utility(i, j, 1, 1)
+        none_dist_j = self.decision_utility(j, i, 1, 1)
         
-        payoff_matrix = [[both_dist, i_dist],
-                         [j_dist, none_dist]]
+        payoff_matrix = [[(both_dist_i, both_dist_j), (i_dist_i, i_dist_j)],
+                         [(j_dist_i, j_dist_j), (none_dist_i, none_dist_j)]]
         
         return payoff_matrix
 
