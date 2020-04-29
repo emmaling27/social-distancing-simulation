@@ -98,17 +98,17 @@ class Evaluator():
 
         return payoff_matrix
 
-    def transpose_2x2_matrix(mat):
+    def transpose_2x2_matrix(self, mat):
         return [row for row in zip(*mat)]
 
-    def get_2x2_matrix(l: list):
+    def get_2x2_matrix(self, l: list):
         result = \
         [[(l[0],l[4]), (l[1],l[5])],
          [(l[2],l[6]), (l[3],l[7])]]
         return result
 
     # Returns the indices of pure nash equilibrium for row player, given matrix form.
-    def get_pure_nash_idx(mat,dim,debug=False):
+    def get_pure_nash_idx(self, mat, dim, debug=False):
 
         # Check input dimensions.
         if len(mat) == dim**3:
