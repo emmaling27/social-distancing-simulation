@@ -145,19 +145,12 @@ class Evaluator():
 
         # This game has no pure nash eq.
         if len(pure_eq) == 0:
-            return None
+            raise Exception("No pure nash.")
 
         if debug: print("pure eq", pure_eq)
 
-        # Return most profitable pure eq for row player.
-        row_profit_by_idx = []
-        for idx in list(pure_eq):
-            i = floor(idx/len(mat))
-            j = idx % len(mat)
-            profit = mat[i][j][0]
-            row_profit_by_idx.append((profit, (i,j)))
-        if debug:
-            print("Profit by Idx:", row_profit_by_idx)
-        row_action = max(row_profit_by_idx)
-        action_val = row_action[1][0]
-        return action_val
+        idx = np.random.choice(pure_eq, 1)
+        row_action = floor(idx/len(mat))
+        col_action = idx % len(mat)
+
+        return (row_action, col_action)
