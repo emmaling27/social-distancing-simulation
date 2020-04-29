@@ -92,7 +92,69 @@ class Evaluator():
         
         return payoff_matrix
 
+    def transpose_2x2_matrix(mat):
+        return [row for row in zip(*mat)]
 
+    def get_2x2_matrix(l: list):
+        result = \
+        [[(l[0],l[4]), (l[1],l[5])],
+         [(l[2],l[6]), (l[3],l[7])]]
+        return result
+
+    # Returns the indices of pure nash equilibrium for row player, given matrix form.
+    def get_pure_nash_idx(mat,dim,debug=False):
+
+        # Check input dimensions.
+        if len(mat) == dim**3:
+            mat = self.get_2x2_matrix(mat)
+        if len(mat) != dim:
+            raise Exception("matrix wrong dim.")        
+        if dim != 2:
+            raise Exception("wrong dimensions.")
+
+        # Get set of row dominant strategies.
+        T = self.transpose_2x2_matrix(mat)
+        row_nash_idx = set()
+        for i in range(len(T)):
+            lst = T[i]
+            for j in range(len(lst)):
+                if lst[j][0] == max(lst, key=lambda x: x[0])[0]:
+                    row_nash_idx.add(i+dim*j)
+        
+        # Get set of col dominant strategies.
+        col_nash_idx = set()
+        for i in range(len(mat)):
+            lst = mat[i]
+            for j in range(len(lst)):
+                if lst[j][1] == max(lst, key=lambda x: x[1])[1]:
+                    col_nash_idx.add(dim*i+j)
+
+        # Debug prints.
+        if debug:
+            print("row dominant strategy", row_nash_idx)
+            print("col dominant strategy", col_nash_idx)
+
+        # Find the intersection of row/col dominant strategies.
+        pure_eq = row_nash_idx.intersection(col_nash_idx)
+
+        # This game has no pure nash eq.
+        if len(pure_eq) == 0:
+            return None
+        
+        if debug: print("pure eq", pure_eq)
+
+        # Return most profitable pure eq for row player.
+        row_profit_by_idx = []
+        for idx in list(pure_eq):
+            i = floor(idx/len(mat))
+            j = idx % len(mat)
+            profit = mat[i][j][0]
+            row_profit_by_idx.append((profit, (i,j)))
+        if debug:
+            print("Profit by Idx:", row_profit_by_idx)
+        row_action = max(row_profit_by_idx)
+        action_val = row_action[1][0]+1
+        return action_val   
 
 
 
