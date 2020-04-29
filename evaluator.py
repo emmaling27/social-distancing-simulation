@@ -18,8 +18,16 @@ class Evaluator():
         self.var_type = var_type
         self.rho = rho
         self.alpha = alpha
+        self.disutility_of_death = -1000
+        self.disutility_of_hospitalization = -100
+        self.disutility_of_illness = -10
+        self.family_scaling = .33
 
     def extract_node_data(self, node):
+        """
+        TODO:  implement.
+        c, f, friendship_level
+        """
         pass
         
     def V(self, i, j):
@@ -37,7 +45,16 @@ class Evaluator():
         c:  Subject is immunocompromised.
         f:  Number of immunocompromised family member (Or indicator var?)
         """
-        pass
+        disutility_for_self = p_death[c] * self.disutility_of_death +/
+                        p_hospitalization[c] * self.disutility_of_hospitalization +/
+                        p_illness[c] * self.disutility_of_illness
+
+        disutility_for_family = p_death[f] * self.disutility_of_death +/
+                        p_hospitalization[f] * self.disutility_of_hospitalization +/
+                        p_illness[f] * self.disutility_of_illness
+        disutility_for_family *= self.family_scaling
+
+        return disutility_for_self + disutility_for_family
         
     def decision_utility(self, i, j, s_i, s_j):
         """
