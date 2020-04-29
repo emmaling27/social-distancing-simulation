@@ -108,15 +108,15 @@ class Evaluator():
         return result
 
     # Returns the indices of pure nash equilibrium for row player, given matrix form.
-    def get_pure_nash_idx(self, mat, dim, debug=False):
+    def get_pure_nash_idx(self, mat, debug=False):
 
         # Check input dimensions.
+        dim = 2
         if len(mat) == dim**3:
             mat = self.get_2x2_matrix(mat)
         if len(mat) != dim:
             raise Exception("matrix wrong dim.")
-        if dim != 2:
-            raise Exception("wrong dimensions.")
+
 
         # Get set of row dominant strategies.
         T = self.transpose_2x2_matrix(mat)
@@ -135,7 +135,6 @@ class Evaluator():
                 if lst[j][1] == max(lst, key=lambda x: x[1])[1]:
                     col_nash_idx.add(dim*i+j)
 
-        # Debug prints.
         if debug:
             print("row dominant strategy", row_nash_idx)
             print("col dominant strategy", col_nash_idx)
@@ -149,7 +148,7 @@ class Evaluator():
 
         if debug: print("pure eq", pure_eq)
 
-        idx = np.random.choice(pure_eq, 1)
+        idx = np.random.choice(np.array(list(pure_eq)), 1)
         row_action = floor(idx/len(mat))
         col_action = idx % len(mat)
 
