@@ -72,7 +72,7 @@ class Evaluator():
         Given two nodes and their decisions to meet, return the
         utility for node i.
         """
-        return min(s_i, s_j)*(self.V(i,j) - self.virus_disutility(i)*self.rho) \
+        return min(s_i, s_j)*(self.V(i,j) + self.virus_disutility(i)*self.rho) \
             - self.alpha * abs(s_i-s_j)
 
     def generate_payoff_matrix(self, i, j):
@@ -159,5 +159,5 @@ class Evaluator():
         if debug:
             print("Profit by Idx:", row_profit_by_idx)
         row_action = max(row_profit_by_idx)
-        action_val = row_action[1][0]+1
+        action_val = row_action[1][0]
         return action_val
