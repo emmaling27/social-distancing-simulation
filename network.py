@@ -57,3 +57,16 @@ class Network():
                 for i in secondary_contacts:
                     self.add_edge(new_node, i)
         return self.g
+
+    def get_node_attrs(self, i):
+        """ Returns a dictionary of senior, ic, icf attributes of node i """
+        assert(i in self.g.nodes())
+        node_attrs = {}
+        for attr in ['senior', 'ic', 'icf']:
+            node_attrs[attr] = bool(nx.get_node_attributes(self.g, attr)[i])
+        return node_attrs
+
+    def get_friendship_level(self, i, j):
+        """ Returns true/false whether i and j are close friends """
+        assert((i, j) in self.g.edges())
+        return bool(nx.get_edge_attributes(self.g, 'close')[(i, j)])
