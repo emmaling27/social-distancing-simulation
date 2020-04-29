@@ -40,8 +40,7 @@ class Evaluator():
             level = 'close'
         else:
             level = 'friend'
-        v = np.random.normal(self.mean_type[level], self.var_type[level])
-        pass
+        return np.random.normal(self.mean_type[level], self.var_type[level])
 
     def calc_disutility(self, p):
         return p['death'] * self.disutility_of_death +\
@@ -73,12 +72,8 @@ class Evaluator():
         Given two nodes and their decisions to meet, return the
         utility for node i.
         """
-
-        d_i = self.virus_disutility(i)
-
-        u_i = min(s_i, s_j)*(self.V(i,j) - d_i*self.rho) - self.alpha * abs(s_i-s_j)
-
-        return u_i
+        return min(s_i, s_j)*(self.V(i,j) - self.virus_disutility(i)*self.rho) \
+            - self.alpha * abs(s_i-s_j)
 
     def generate_payoff_matrix(self, i, j):
         """

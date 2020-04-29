@@ -69,4 +69,5 @@ class Network():
     def get_friendship_level(self, i, j):
         """ Returns true/false whether i and j are close friends """
         assert((i, j) in self.g.edges())
-        return bool(nx.get_edge_attributes(self.g, 'close')[(i, j)])
+        return bool(
+            nx.get_edge_attributes(self.g, 'close')[(min(i, j), max(i, j))])
