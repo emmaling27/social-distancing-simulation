@@ -161,7 +161,7 @@ class Evaluator():
 
         # This game has no pure nash eq.
         if len(pure_eq) == 0:
-            raise Exception("No pure nash.")
+            return self.get_mixed_eq(mat)
 
         if debug: print("pure eq", pure_eq)
 
@@ -169,4 +169,38 @@ class Evaluator():
         row_action = floor(idx/len(mat))
         col_action = idx % len(mat)
 
-        return (row_action, col_action)
+        # Return value is a probability distribution for each player.
+        row_dist = [0.0,0.0]
+        col_dist = [0.0,0.0]
+
+        row_dist[row_action] = 1.0
+        col_dist[col_action] = 1.0
+
+        return (row_dist, col_dist)
+
+    def get_mixed_eq(self, mat):
+        # Check input dimensions.
+        dim = 2
+        if len(mat) == dim**3:
+            mat = self.get_2x2_matrix(mat)
+        if len(mat) != dim:
+            raise Exception("matrix wrong dim.")  
+
+        a = mat[0][0][0]
+        b = mat[0][1][0]
+        c = mat[1][0][0]
+        d = mat[1][1][0]
+
+        e = mat[0][0][1]
+        f = mat[0][1][1]
+        g = mat[1][0][1]
+        h = mat[1][1][1]
+
+        p = (h-g)/(e-g-f+h)
+        q = (d-b)/(a-b-c+d)
+        return ((p, 1-p),(q, 1-q))
+
+        
+
+
+
