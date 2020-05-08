@@ -82,25 +82,25 @@ class Evaluator():
             # Add the gain-loss sensation, reference is high for seniors, low for juniors?
             year = int(self.g.get_node_attrs(i)['senior'])
             utility += self.mu * (utility - self.lam[year] * self.V(i, j))
-        return utilityr
+        return utility
 
-    def generate_payoff_matrix(self, i, j):
+    def generate_payoff_matrix(self, i, j, reference_dependent=False):
         """
         Given two nodes, return the unique 2x2 payoff matrix.
         [[both distance, I distance],
         [you distance, neither distance]]
         """
-        both_dist_i = self.decision_utility(i, j, 0, 0)
-        both_dist_j = self.decision_utility(j, i, 0, 0)
+        both_dist_i = self.decision_utility(i, j, 0, 0, reference_dependent)
+        both_dist_j = self.decision_utility(j, i, 0, 0, reference_dependent)
 
-        i_dist_i = self.decision_utility(i, j, 0, 1)
-        i_dist_j = self.decision_utility(j, i, 1, 0)
+        i_dist_i = self.decision_utility(i, j, 0, 1, reference_dependent,)
+        i_dist_j = self.decision_utility(j, i, 1, 0, reference_dependent)
 
-        j_dist_i = self.decision_utility(i, j, 1, 0)
-        j_dist_j = self.decision_utility(j, i, 0, 1)
+        j_dist_i = self.decision_utility(i, j, 1, 0, reference_dependent,)
+        j_dist_j = self.decision_utility(j, i, 0, 1, reference_dependent)
 
-        none_dist_i = self.decision_utility(i, j, 1, 1)
-        none_dist_j = self.decision_utility(j, i, 1, 1)
+        none_dist_i = self.decision_utility(i, j, 1, 1, reference_dependent)
+        none_dist_j = self.decision_utility(j, i, 1, 1, reference_dependent)
 
         payoff_matrix = [[(both_dist_i, both_dist_j), (i_dist_i, i_dist_j)],
                          [(j_dist_i, j_dist_j), (none_dist_i, none_dist_j)]]
