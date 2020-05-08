@@ -125,7 +125,17 @@ class Evaluator():
         return result
 
     # Returns the indices of pure nash equilibrium for row player, given matrix form.
-    def get_pure_nash_idx(self, mat, debug=False):
+    def get_nash_idx(self, mat, debug=False):
+        strats = self.get_nash_eq_strategies(mat, debug=debug)
+        p = strats[0][1]
+        q = strats[1][1]
+        row_action = np.random.binomial(1, 1-p, 1)[0]
+        col_action = np.random.binomial(1, 1-q, 1)[0]
+
+        return (row_action, col_action)
+
+    # Returns the indices of pure nash equilibrium for row player, given matrix form.
+    def get_nash_eq_strategies(self, mat, debug=False):
 
         # Check input dimensions.
         dim = 2
