@@ -7,12 +7,14 @@ class Evaluator():
     Provides a set of tools for deriving utility for a 2x2 game.
     """
 
-    def __init__(self, mean_type, var_type, rho, alpha, network):
+    def __init__(self, mean_type, var_type, rho, alpha, mu, lam, network):
         """
         mean_type: list of per type means for value distribution
         var_type: list of per type variances for value distribution
         rho: risk parameter of meeting someone. Constant across each edge.
         alpha: the disutility weight of disagreeing on i,j meeting (alpha>0).
+        mu: loss aversion parameter
+        lam: reference multiplier list [junior_multiplier, senior_multiplier]
         network: the nx graph of the network
         """
         self.mean_type = mean_type
@@ -29,6 +31,8 @@ class Evaluator():
         self.p_ic = {'death': .1, 'hosp': .5, 'ill': .8}
         self.pf = {'death': .1, 'hosp': .3, 'ill': .5}
         self.pf_icf = {'death': .5, 'hosp': .7, 'ill': .9}
+        self.mu = mu
+        self.lam = lam
 
 
     def V(self, i, j):
@@ -67,13 +71,18 @@ class Evaluator():
 
         return disutility_for_self + disutility_for_family
 
-    def decision_utility(self, i, j, s_i, s_j):
+    def decision_utility(self, i, j, s_i, s_j, reference_dependent=False):
         """
         Given two nodes and their decisions to meet, return the
         utility for node i.
         """
-        return min(s_i, s_j)*(self.V(i,j) + self.virus_disutility(i)*self.rho) \
+        utility = min(s_i, s_j)*(self.V(i,j) + self.virus_disutility(i)*self.rho) \
             - self.alpha * abs(s_i-s_j)
+        if reference_dependent:
+            # Add the gain-loss sensation, reference is high for seniors, low for juniors?
+            year = int(self.g.get_node_attrs(i)['senior'])
+            utility += self.mu * (utility - self.lam[year] * self.V(i, j))
+        return utilityr
 
     def generate_payoff_matrix(self, i, j):
         """
@@ -97,6 +106,14 @@ class Evaluator():
                          [(j_dist_i, j_dist_j), (none_dist_i, none_dist_j)]]
 
         return payoff_matrix
+
+    def find_cpe(self, mat):
+        """
+        Returns the CPE (choice-acclimating personal equilibrium)
+         in the reference-dependent utility model
+        """
+        pass
+        # return (row_action, col_action)
 
     def transpose_2x2_matrix(self, mat):
         return [row for row in zip(*mat)]
