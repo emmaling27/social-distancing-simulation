@@ -208,14 +208,10 @@ class Evaluator():
         q = (d-b)/(a-b-c+d)
         return ((p, 1-p),(q, 1-q))
 
-    # Transposes a 2x2 matrix.
-    def transpose_2x2_matrix(mat):
-        return [row for row in zip(*mat)]
-
-    def util(opp_strat, game, i, col=False):
+    def util(self, opp_strat, game, i, col=False):
         return opp_strat[0] * game[i][0][int(col)] + opp_strat[1] * game[i][1][int(col)]
 
-    def QRE(game, lam, level_k):
+    def QRE(self, game, lam, level_k):
         # Should output [p_1, p_2, p_3] where p_i is probability of playing action i
         # Check input dimensions.
         if len(game) != 2:
@@ -240,7 +236,7 @@ class Evaluator():
 
         return row_strat, col_strat
 
-    def get_qre_decision(mat):
+    def get_qre_decision(self, mat):
         strats = self.QRE(mat, self.lamqre, self.level_k)
 
         p = strats[0][0]
