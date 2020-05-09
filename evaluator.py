@@ -74,7 +74,7 @@ class Evaluator():
         Given two nodes and their decisions to meet, return the
         utility for node i.
         """
-        utility = min(s_i, s_j)*(self.V(i,j) + self.virus_disutility(i)*self.rho) \
+        utility = min(s_i, s_j)*(self.V(i,j) + self.virus_disutility(i) * self.rho) \
             - self.alpha * abs(s_i-s_j)
         if reference_dependent:
             # Add the gain-loss sensation, reference is high for seniors, low for juniors?

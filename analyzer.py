@@ -1,5 +1,6 @@
 from evaluator import Evaluator
 from network import Network
+import numpy as np
 
 class Analyzer():
 
@@ -28,6 +29,11 @@ class Analyzer():
     def _get_start_distribution(self):
         return {'both_distance': 0, 'conflict': 0, 'meet_up': 0}
 
+    def _print_payoff_matrix(self, mat):
+        mat = np.round(mat)
+        print(mat[0][0],mat[0][1])
+        print(mat[1][0], mat[1][1])
+
     def get_outcome_distribution(self, reference_dependent=False, debug=False):
         outcomes = {
             'all': self._get_start_distribution(),
@@ -44,7 +50,7 @@ class Analyzer():
             (row_action, col_action) = self.evaluator.get_nash_idx(payoff_matrix)
             attrs = self.get_edge_attrs(edge)
             if debug:
-                print(payoff_matrix)
+                self._print_payoff_matrix(payoff_matrix)
                 print(row_action, col_action)
                 print(self.evaluator.network.get_node_attrs(edge[0]))
                 print(self.evaluator.network.get_node_attrs(edge[1]))
