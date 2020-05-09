@@ -1,13 +1,15 @@
 import numpy as np
 from math import *
 from network import Network
+import networkx as nx
+
 
 class Evaluator():
     """
     Provides a set of tools for deriving utility for a 2x2 game.
     """
 
-    def __init__(self, mean_type, var_type, rho, alpha, mu, lam, network):
+    def __init__(self, rho, alpha, mu, lam, network):
         """
         mean_type: list of per type means for value distribution
         var_type: list of per type variances for value distribution
@@ -17,11 +19,9 @@ class Evaluator():
         lam: reference multiplier list [junior_multiplier, senior_multiplier]
         network: the nx graph of the network
         """
-        self.mean_type = mean_type
-        self.var_type = var_type
         self.rho = rho
         self.alpha = alpha
-        self.g = network
+        self.network = network
         self.disutility_of_death = -1000
         self.disutility_of_hospitalization = -100
         self.disutility_of_illness = -10
@@ -30,7 +30,7 @@ class Evaluator():
         self.p = {'death': .01, 'hosp': .05, 'ill': .2}
         self.p_ic = {'death': .1, 'hosp': .5, 'ill': .8}
         self.pf = {'death': .1, 'hosp': .3, 'ill': .5}
-        self.pf_icf = {'death': .5, 'hosp': .7, 'ill': .9}
+        self.pf_icf = self.p_ic # {'death': .5, 'hosp': .7, 'ill': .9}
         self.mu = mu
         self.lam = lam
 
@@ -40,11 +40,7 @@ class Evaluator():
         Given two nodes and their friendship level,
         determine the value of the relationship for node i.
         """
-        if self.g.get_friendship_level(i, j):
-            level = 'close'
-        else:
-            level = 'friend'
-        return np.random.normal(self.mean_type[level], self.var_type[level])
+        return nx.get_edge_attributes(self.network.g, 'value')[(min(i, j), max(i, j))]
 
     def calc_disutility(self, p):
         return p['death'] * self.disutility_of_death +\
@@ -57,7 +53,7 @@ class Evaluator():
         c:  Subject is immunocompromised.
         f:  Number of immunocompromised family member (Or indicator var?)
         """
-        node_attrs = self.g.get_node_attrs(i)
+        node_attrs = self.network.get_node_attrs(i)
         if node_attrs['ic']:
             disutility_for_self = self.calc_disutility(self.p_ic)
         else:
@@ -80,7 +76,7 @@ class Evaluator():
             - self.alpha * abs(s_i-s_j)
         if reference_dependent:
             # Add the gain-loss sensation, reference is high for seniors, low for juniors?
-            year = int(self.g.get_node_attrs(i)['senior'])
+            year = int(self.network.get_node_attrs(i)['senior'])
             utility += self.mu * (utility - self.lam[year] * self.V(i, j))
         return utility
 
@@ -127,8 +123,8 @@ class Evaluator():
     # Returns the indices of pure nash equilibrium for row player, given matrix form.
     def get_nash_idx(self, mat, debug=False):
         strats = self.get_nash_eq_strategies(mat, debug=debug)
-        p = strats[0][1]
-        q = strats[1][1]
+        p = strats[0][0]
+        q = strats[1][0]
         row_action = np.random.binomial(1, 1-p, 1)[0]
         col_action = np.random.binomial(1, 1-q, 1)[0]
 
@@ -176,8 +172,8 @@ class Evaluator():
         if debug: print("pure eq", pure_eq)
 
         idx = np.random.choice(np.array(list(pure_eq)), 1)
-        row_action = floor(idx/len(mat))
-        col_action = idx % len(mat)
+        row_action = int(floor(idx/len(mat)))
+        col_action = int(idx % len(mat))
 
         # Return value is a probability distribution for each player.
         row_dist = [0.0,0.0]

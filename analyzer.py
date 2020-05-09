@@ -5,7 +5,7 @@ class Analyzer():
 
     def __init__(self, evaluator):
         self.evaluator = evaluator
-        self.network = evaluator.g
+        self.network = evaluator.network
     
     def get_edge_attrs(self, edge):
         attrs = ['all']
@@ -16,11 +16,11 @@ class Analyzer():
         if u_attrs['icf'] or v_attrs['icf']:
             attrs.append('icf')
         if u_attrs['senior'] and v_attrs['senior']:
-            attrs.append('senior-senior')
+            attrs.append('s-s')
         elif u_attrs['senior'] != v_attrs['senior']:
-            attrs.append('senior-junior')
+            attrs.append('s-j')
         else:
-            attrs.append('junior-junior')
+            attrs.append('j-j')
         if self.network.get_friendship_level(edge[0], edge[1]):
             attrs.append('close')
         return attrs
@@ -33,21 +33,21 @@ class Analyzer():
             'all': self._get_start_distribution(),
             'ic': self._get_start_distribution(),
             'icf': self._get_start_distribution(),
-            'senior-senior': self._get_start_distribution(),
-            'junior-junior': self._get_start_distribution(),
-            'senior-junior': self._get_start_distribution(),
+            's-s': self._get_start_distribution(),
+            'j-j': self._get_start_distribution(),
+            's-j': self._get_start_distribution(),
             'close': self._get_start_distribution()
         }
 
         for edge in self.network.g.edges():
             payoff_matrix = self.evaluator.generate_payoff_matrix(edge[0], edge[1], reference_dependent)
-            (row_action, col_action) = self.evaluator.get_pure_nash_idx(payoff_matrix)
+            (row_action, col_action) = self.evaluator.get_nash_idx(payoff_matrix)
             attrs = self.get_edge_attrs(edge)
             if debug:
                 print(payoff_matrix)
                 print(row_action, col_action)
-                print(self.evaluator.g.get_node_attrs(edge[0]))
-                print(self.evaluator.g.get_node_attrs(edge[1]))
+                print(self.evaluator.network.get_node_attrs(edge[0]))
+                print(self.evaluator.network.get_node_attrs(edge[1]))
                 print(attrs)
             if row_action != col_action:
                 for attr in attrs:

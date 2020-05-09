@@ -5,7 +5,7 @@ import numpy as np
 class Network():
     """ Generate a network using Toivonen et al.'s social network model """
 
-    def __init__(self, n_0, n):
+    def __init__(self, n_0, n, mean_type, var_type):
         """
         n_0: initial seed of nodes
         n: number of nodes the network should have
@@ -14,6 +14,8 @@ class Network():
         assert(n_0 > 0)
         self.n_0 = n_0
         self.n = n
+        self.mean_type = mean_type
+        self.var_type = var_type
         self.ic_rate = .016
         self.icf_rate = .08
         self.close_friends_rate = .1
@@ -29,9 +31,9 @@ class Network():
 
     def add_edge(self, i, j):
         """ Adds edge (i, j) to graph """
-        self.g.add_edge(i,
-            j,
-            close=self.rng.binomial(1, self.close_friends_rate))
+        close = self.rng.binomial(1, self.close_friends_rate)
+        value = self.rng.normal(self.mean_type[close], self.var_type[close])
+        self.g.add_edge(i, j, close=close, value=value)
 
     def generate_network(self):
         """
@@ -43,7 +45,7 @@ class Network():
             self.add_node(new_node)
             initial_contacts = self.rng.choice(
                 np.array(self.g.nodes()),
-                self.rng.binomial(1, .05) + 1,
+                self.rng.binomial(1, .05) + 3,
                 replace=False)
             secondary_pool = []
             for i in initial_contacts:
