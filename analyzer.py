@@ -34,7 +34,7 @@ class Analyzer():
         print(mat[0][0],mat[0][1])
         print(mat[1][0], mat[1][1])
 
-    def get_outcome_distribution(self, reference_dependent=False, debug=False):
+    def get_outcome_distribution(self, qre=False, reference_dependent=False, debug=False):
         outcomes = {
             'all': self._get_start_distribution(),
             'ic': self._get_start_distribution(),
@@ -47,7 +47,10 @@ class Analyzer():
 
         for edge in self.network.g.edges():
             payoff_matrix = self.evaluator.generate_payoff_matrix(edge[0], edge[1], reference_dependent)
-            (row_action, col_action) = self.evaluator.get_nash_idx(payoff_matrix)
+            if qre:
+                (row_action, col_action) = self.evaluator.get_qre_decision(payoff_matrix)
+            else:
+                (row_action, col_action) = self.evaluator.get_nash_idx(payoff_matrix)
             attrs = self.get_edge_attrs(edge)
             if debug:
                 self._print_payoff_matrix(payoff_matrix)
