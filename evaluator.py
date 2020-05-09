@@ -9,7 +9,7 @@ class Evaluator():
     Provides a set of tools for deriving utility for a 2x2 game.
     """
 
-    def __init__(self, rho, alpha, mu, lam, network):
+    def __init__(self, rho, alpha, mu, lam, lamqre, level_k, network):
         """
         mean_type: list of per type means for value distribution
         var_type: list of per type variances for value distribution
@@ -33,6 +33,8 @@ class Evaluator():
         self.pf_icf = self.p_ic # {'death': .5, 'hosp': .7, 'ill': .9}
         self.mu = mu
         self.lam = lam
+        self.lamqre = lamqre
+        self.level_k = level_k
 
 
     def V(self, i, j):
@@ -205,6 +207,46 @@ class Evaluator():
         p = (h-g)/(e-g-f+h)
         q = (d-b)/(a-b-c+d)
         return ((p, 1-p),(q, 1-q))
+
+    # Transposes a 2x2 matrix.
+    def transpose_2x2_matrix(mat):
+        return [row for row in zip(*mat)]
+
+    def QRE(game, lam, level_k):
+        # Should output [p_1, p_2, p_3] where p_i is probability of playing action i
+        # Check input dimensions.
+        if len(game) != 2:
+            raise Exception("QBR: matrix wrong dim.")
+            
+        game_t = self.transpose_2x2_matrix(game)
+        
+        col_strat = [1/len(game) for _ in range(len(game))]
+        row_strat = [0, 0]
+
+        for _ in range(level_k+1):
+
+            # Find initial level-0 response
+            denominator = sum([exp(lam * util(col_strat, game, i)) for i in range(2)])
+            for i in range(2):
+                row_strat[i] = exp(lam * util(col_strat, game, i)) / denominator
+        
+            # Find the col player's QRE.
+            denominator = sum([exp(lam * util(row_strat, game_t, i, col=True)) for i in range(2)])
+            for i in range(2):
+                col_strat[i] = exp(lam * util(row_strat, game_t, i, col=True)) / denominator        
+
+        return row_strat, col_strat
+
+    def get_qre_decision(mat):
+        strats = self.QRE(mat, self.lamqre, self.level_k)
+
+        p = strats[0][0]
+        q = strats[1][0]
+        row_action = np.random.binomial(1, 1-p, 1)[0]
+        col_action = np.random.binomial(1, 1-q, 1)[0]
+
+        return (row_action, col_action)
+
 
         
 
