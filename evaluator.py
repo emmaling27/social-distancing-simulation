@@ -212,6 +212,9 @@ class Evaluator():
     def transpose_2x2_matrix(mat):
         return [row for row in zip(*mat)]
 
+    def util(opp_strat, game, i, col=False):
+        return opp_strat[0] * game[i][0][int(col)] + opp_strat[1] * game[i][1][int(col)]
+
     def QRE(game, lam, level_k):
         # Should output [p_1, p_2, p_3] where p_i is probability of playing action i
         # Check input dimensions.
@@ -226,14 +229,14 @@ class Evaluator():
         for _ in range(level_k+1):
 
             # Find initial level-0 response
-            denominator = sum([exp(lam * util(col_strat, game, i)) for i in range(2)])
+            denominator = sum([exp(lam * self.util(col_strat, game, i)) for i in range(2)])
             for i in range(2):
-                row_strat[i] = exp(lam * util(col_strat, game, i)) / denominator
+                row_strat[i] = exp(lam * self.util(col_strat, game, i)) / denominator
         
             # Find the col player's QRE.
-            denominator = sum([exp(lam * util(row_strat, game_t, i, col=True)) for i in range(2)])
+            denominator = sum([exp(lam * self.util(row_strat, game_t, i, col=True)) for i in range(2)])
             for i in range(2):
-                col_strat[i] = exp(lam * util(row_strat, game_t, i, col=True)) / denominator        
+                col_strat[i] = exp(lam * self.util(row_strat, game_t, i, col=True)) / denominator        
 
         return row_strat, col_strat
 
