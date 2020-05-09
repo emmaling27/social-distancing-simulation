@@ -243,10 +243,8 @@ class Evaluator():
     def get_qre_decision(mat):
         strats = self.QRE(mat, self.lamqre, self.level_k)
 
-        p = strats[0][0]
-        q = strats[1][0]
-        row_action = np.random.binomial(1, 1-p, 1)[0]
-        col_action = np.random.binomial(1, 1-q, 1)[0]
+        row_action = np.argmax(strats[0])
+        col_action = np.argmax(strats[1])
 
         return (row_action, col_action)
 
