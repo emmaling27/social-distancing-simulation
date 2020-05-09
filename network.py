@@ -19,7 +19,7 @@ class Network():
         self.ic_rate = .016
         self.icf_rate = .08
         self.close_friends_rate = .1
-        self.g = nx.Graph()
+        self.g = nx.DiGraph()
         self.rng = np.random.default_rng()
 
     def add_node(self, i):
@@ -32,8 +32,10 @@ class Network():
     def add_edge(self, i, j):
         """ Adds edge (i, j) to graph """
         close = self.rng.binomial(1, self.close_friends_rate)
-        value = self.rng.normal(self.mean_type[close], self.var_type[close])
-        self.g.add_edge(i, j, close=close, value=value)
+        value_i = self.rng.normal(self.mean_type[close], self.var_type[close])
+        self.g.add_edge(i, j, close=close, value=value_i)
+        value_j = self.rng.normal(self.mean_type[close], self.var_type[close])
+        self.g.add_edge(j, i, close=close, value=value_j)
 
     def generate_network(self):
         """

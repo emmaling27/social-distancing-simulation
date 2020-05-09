@@ -40,7 +40,7 @@ class Evaluator():
         Given two nodes and their friendship level,
         determine the value of the relationship for node i.
         """
-        return nx.get_edge_attributes(self.network.g, 'value')[(min(i, j), max(i, j))]
+        return nx.get_edge_attributes(self.network.g, 'value')[(i, j)]
 
     def calc_disutility(self, p):
         return p['death'] * self.disutility_of_death +\
