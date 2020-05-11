@@ -9,13 +9,13 @@ class Evaluator():
     Provides a set of tools for deriving utility for a 2x2 game.
     """
 
-    def __init__(self, rho, alpha, mu, lam, lamqre, level_k, network):
+    def __init__(self, rho, alpha, eta, lam, lamqre, level_k, network):
         """
         mean_type: list of per type means for value distribution
         var_type: list of per type variances for value distribution
         rho: risk parameter of meeting someone. Constant across each edge.
         alpha: the disutility weight of disagreeing on i,j meeting (alpha>0).
-        mu: loss aversion parameter
+        eta: loss aversion parameter
         lam: reference multiplier list [junior_multiplier, senior_multiplier]
         network: the nx graph of the network
         """
@@ -31,7 +31,7 @@ class Evaluator():
         self.p_ic = {'death': .1, 'hosp': .5, 'ill': .8}
         self.pf = {'death': .1, 'hosp': .3, 'ill': .5}
         self.pf_icf = self.p_ic # {'death': .5, 'hosp': .7, 'ill': .9}
-        self.mu = mu
+        self.eta = eta
         self.lam = lam
         self.lamqre = lamqre
         self.level_k = level_k
@@ -77,9 +77,8 @@ class Evaluator():
         utility = min(s_i, s_j)*(self.V(i,j) + self.virus_disutility(i) * self.rho) \
             - self.alpha * abs(s_i-s_j)
         if reference_dependent:
-            # Add the gain-loss sensation, reference is high for seniors, low for juniors?
             year = int(self.network.get_node_attrs(i)['senior'])
-            utility += self.mu * (utility - self.lam[year] * self.V(i, j))
+            utility += self.eta * (utility - self.lam[year] * self.V(i, j))
         return utility
 
     def generate_payoff_matrix(self, i, j, reference_dependent=False):
@@ -177,7 +176,6 @@ class Evaluator():
         row_action = int(floor(idx/len(mat)))
         col_action = int(idx % len(mat))
 
-        # Return value is a probability distribution for each player.
         row_dist = [0.0,0.0]
         col_dist = [0.0,0.0]
 
@@ -243,9 +241,3 @@ class Evaluator():
         col_action = np.argmax(strats[1])
 
         return (row_action, col_action)
-
-
-        
-
-
-
